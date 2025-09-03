@@ -85,82 +85,176 @@ All colors MUST be HSL.
   }
 
   /* Avatar awareness animation - simulates becoming aware of user */
-  .avatar-awareness {
-    animation: avatar-becomes-aware 3s ease-in-out 0.5s both;
+  /* Avatar States - Realistic Animation Sequence */
+  .avatar-sleeping {
+    transform: perspective(1000px) rotateY(-30deg) rotateX(20deg) scale(0.8);
+    filter: brightness(0.4) contrast(0.6) saturate(0.3) blur(1px);
+    border-color: hsl(var(--muted) / 0.3);
+    box-shadow: 0 5px 15px hsl(var(--background) / 0.8);
+    animation: subtle-breathing 4s ease-in-out infinite;
   }
 
-  @keyframes avatar-becomes-aware {
+  .avatar-awakening {
+    animation: coming-to-awareness 3s ease-out forwards;
+  }
+
+  .avatar-aware {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1);
+    filter: brightness(1.1) contrast(1.2) saturate(1.3);
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 
+      0 20px 40px hsl(var(--primary) / 0.3),
+      0 0 60px hsl(var(--primary-glow) / 0.4),
+      inset 0 0 20px hsl(var(--accent) / 0.1);
+    animation: aware-breathing 3s ease-in-out infinite;
+    transition: transform 0.1s ease-out, filter 0.3s ease-out;
+  }
+
+  /* Breathing animations */
+  @keyframes subtle-breathing {
+    0%, 100% { 
+      transform: perspective(1000px) rotateY(-30deg) rotateX(20deg) scale(0.8); 
+    }
+    50% { 
+      transform: perspective(1000px) rotateY(-30deg) rotateX(20deg) scale(0.82); 
+    }
+  }
+
+  @keyframes aware-breathing {
+    0%, 100% { 
+      filter: brightness(1.1) contrast(1.2) saturate(1.3); 
+    }
+    50% { 
+      filter: brightness(1.15) contrast(1.25) saturate(1.35); 
+    }
+  }
+
+  /* Coming to awareness - realistic awakening sequence */
+  @keyframes coming-to-awareness {
     0% {
-      transform: rotateY(-25deg) rotateX(15deg) scale(0.85);
-      filter: brightness(0.6) contrast(0.7) saturate(0.5);
+      transform: perspective(1000px) rotateY(-30deg) rotateX(20deg) scale(0.8);
+      filter: brightness(0.4) contrast(0.6) saturate(0.3) blur(1px);
+      border-color: hsl(var(--muted) / 0.3);
     }
-    25% {
-      transform: rotateY(-15deg) rotateX(8deg) scale(0.92);
-      filter: brightness(0.75) contrast(0.85) saturate(0.7);
+    15% {
+      /* First micro-movement - like stirring */
+      transform: perspective(1000px) rotateY(-25deg) rotateX(18deg) scale(0.82);
+      filter: brightness(0.5) contrast(0.7) saturate(0.4) blur(0.8px);
     }
-    50% {
-      transform: rotateY(-5deg) rotateX(3deg) scale(0.98);
-      filter: brightness(0.9) contrast(1) saturate(0.9);
+    30% {
+      /* Slight head lift */
+      transform: perspective(1000px) rotateY(-20deg) rotateX(12deg) scale(0.85);
+      filter: brightness(0.6) contrast(0.8) saturate(0.6) blur(0.5px);
+    }
+    45% {
+      /* More pronounced movement - turning toward viewer */
+      transform: perspective(1000px) rotateY(-10deg) rotateX(8deg) scale(0.9);
+      filter: brightness(0.75) contrast(0.9) saturate(0.8) blur(0.2px);
+    }
+    60% {
+      /* Almost facing forward */
+      transform: perspective(1000px) rotateY(-3deg) rotateX(3deg) scale(0.95);
+      filter: brightness(0.9) contrast(1.05) saturate(1) blur(0px);
     }
     75% {
-      transform: rotateY(2deg) rotateX(-2deg) scale(1.02);
-      filter: brightness(1.05) contrast(1.1) saturate(1.1);
+      /* Slight overshoot for natural movement */
+      transform: perspective(1000px) rotateY(2deg) rotateX(-1deg) scale(1.02);
+      filter: brightness(1.05) contrast(1.15) saturate(1.2);
+      border-color: hsl(var(--primary) / 0.4);
+    }
+    90% {
+      /* Settling into aware state */
+      transform: perspective(1000px) rotateY(-1deg) rotateX(1deg) scale(1.01);
+      filter: brightness(1.08) contrast(1.18) saturate(1.25);
+      border-color: hsl(var(--primary) / 0.5);
     }
     100% {
-      transform: rotateY(0deg) rotateX(0deg) scale(1);
-      filter: brightness(1.1) contrast(1.15) saturate(1.2);
+      /* Fully aware and ready to track */
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1);
+      filter: brightness(1.1) contrast(1.2) saturate(1.3);
+      border-color: hsl(var(--primary) / 0.6);
     }
   }
 
   /* Awareness glow animation */
-  @keyframes awareness-glow {
+  @keyframes awareness-ring {
     0% {
       opacity: 0;
-      transform: scale(0.8) rotate(0deg);
+      transform: scale(0.9) rotate(0deg);
     }
-    25% {
-      opacity: 0.3;
-      transform: scale(1.1) rotate(90deg);
+    20% {
+      opacity: 0.6;
+      transform: scale(1.2) rotate(72deg);
     }
     50% {
-      opacity: 0.6;
+      opacity: 0.8;
       transform: scale(1.3) rotate(180deg);
     }
-    75% {
-      opacity: 0.4;
-      transform: scale(1.2) rotate(270deg);
+    80% {
+      opacity: 0.6;
+      transform: scale(1.2) rotate(288deg);
     }
     100% {
-      opacity: 0.2;
-      transform: scale(1.0) rotate(360deg);
+      opacity: 0.4;
+      transform: scale(1.1) rotate(360deg);
     }
   }
 
   /* Recognition pulse animation */
-  @keyframes recognition-pulse {
+  @keyframes recognition-pulse-1 {
+    0% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    30% {
+      opacity: 0.8;
+      transform: scale(1.4);
+    }
+    60% {
+      opacity: 0.3;
+      transform: scale(2);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2.5);
+    }
+  }
+
+  @keyframes recognition-pulse-2 {
+    0% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    25% {
+      opacity: 0.6;
+      transform: scale(1.2);
+    }
+    50% {
+      opacity: 0.2;
+      transform: scale(1.8);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2.2);
+    }
+  }
+
+  @keyframes recognition-pulse-3 {
     0% {
       opacity: 0;
       transform: scale(1);
     }
     20% {
-      opacity: 0.6;
-      transform: scale(1.3);
+      opacity: 0.4;
+      transform: scale(1.1);
     }
     40% {
-      opacity: 0.4;
-      transform: scale(1.5);
-    }
-    60% {
-      opacity: 0.2;
-      transform: scale(2);
-    }
-    80% {
       opacity: 0.1;
-      transform: scale(2.3);
+      transform: scale(1.6);
     }
     100% {
       opacity: 0;
-      transform: scale(2.8);
+      transform: scale(2);
     }
   }
 
@@ -189,12 +283,20 @@ All colors MUST be HSL.
       transform: scale(1.02); 
     }
   }
-  .animate-awareness-glow {
-    animation: awareness-glow 4s linear 2s infinite;
+  .animate-awareness-ring {
+    animation: awareness-ring 6s linear infinite;
   }
 
-  .animate-recognition-pulse {
-    animation: recognition-pulse 1.5s ease-out 3s 4;
+  .animate-recognition-pulse-1 {
+    animation: recognition-pulse-1 2s ease-out 3s 3;
+  }
+
+  .animate-recognition-pulse-2 {
+    animation: recognition-pulse-2 2.2s ease-out 3.5s 3;
+  }
+
+  .animate-recognition-pulse-3 {
+    animation: recognition-pulse-3 2.4s ease-out 4s 3;
   }
 
   .animate-enhanced-float {

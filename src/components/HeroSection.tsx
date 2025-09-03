@@ -6,51 +6,51 @@ export const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAware, setIsAware] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 });
+  const [isLookingAtCursor, setIsLookingAtCursor] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
-    // Start awareness animation after a delay
-    const awarenessTimer = setTimeout(() => {
+    
+    // Simulate coming to awareness sequence
+    const awarenessSequence = async () => {
+      // Phase 1: Initial sleep state (0-1s)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Phase 2: First movement - slight head turn (1-2s)
       setIsAware(true);
-    }, 2000);
+      
+      // Phase 3: Full awareness and cursor tracking (3s+)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsLookingAtCursor(true);
+    };
 
-    return () => clearTimeout(awarenessTimer);
+    awarenessSequence();
   }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (avatarRef.current && containerRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const avatarRect = avatarRef.current.getBoundingClientRect();
-        
-        // Calculate mouse position relative to the avatar center
-        const avatarCenterX = avatarRect.left + avatarRect.width / 2;
-        const avatarCenterY = avatarRect.top + avatarRect.height / 2;
-        
-        // Calculate distance and angle from avatar center to mouse
-        const deltaX = e.clientX - avatarCenterX;
-        const deltaY = e.clientY - avatarCenterY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        // Normalize the movement (stronger effect when closer)
-        const maxDistance = Math.min(window.innerWidth, window.innerHeight) / 2;
-        const intensity = Math.max(0, 1 - distance / maxDistance);
-        
-        // Calculate rotation based on mouse position
-        const rotationX = (deltaY / avatarRect.height) * 15 * intensity;
-        const rotationY = (deltaX / avatarRect.width) * 15 * intensity;
-        
-        // Calculate eye tracking position
-        const eyeX = Math.max(-8, Math.min(8, (deltaX / avatarRect.width) * 20));
-        const eyeY = Math.max(-5, Math.min(5, (deltaY / avatarRect.height) * 15));
-        
-        setMousePosition({ x: rotationY, y: -rotationX });
-        setEyePosition({ x: eyeX, y: eyeY });
-      }
+      if (!isLookingAtCursor || !avatarRef.current) return;
+
+      const avatarRect = avatarRef.current.getBoundingClientRect();
+      const avatarCenterX = avatarRect.left + avatarRect.width / 2;
+      const avatarCenterY = avatarRect.top + avatarRect.height / 2;
+      
+      // Calculate angle from avatar to cursor
+      const deltaX = e.clientX - avatarCenterX;
+      const deltaY = e.clientY - avatarCenterY;
+      
+      // Normalize to reasonable head movement range
+      const maxDistance = 300;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const intensity = Math.min(1, distance / maxDistance);
+      
+      // Calculate head rotation (limited range for realism)
+      const headRotationY = Math.max(-25, Math.min(25, (deltaX / maxDistance) * 30));
+      const headRotationX = Math.max(-15, Math.min(15, (deltaY / maxDistance) * 20));
+      
+      setMousePosition({ x: headRotationY, y: headRotationX });
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -63,7 +63,7 @@ export const HeroSection = () => {
       }
     };
 
-    if (isAware) {
+    if (isLookingAtCursor) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('touchmove', handleTouchMove);
     }
@@ -72,7 +72,7 @@ export const HeroSection = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isAware]);
+  }, [isLookingAtCursor]);
 
   return (
     <section ref={containerRef} className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -83,111 +83,95 @@ export const HeroSection = () => {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}>
         
-        {/* Interactive Avatar with Enhanced Reactivity */}
-        <div 
-          ref={avatarRef}
-          className="relative mx-auto w-80 h-80 mb-8 group cursor-pointer"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onTouchStart={() => setIsHovered(true)}
-          onTouchEnd={() => setIsHovered(false)}
-          style={{ perspective: '1000px' }}
-        >
-          {/* Outer glow ring */}
+        {/* Realistic Avatar Animation */}
+        <div className="relative mx-auto w-80 h-80 mb-8 group">
+          {/* Awareness glow ring */}
           <div 
-            className={`absolute inset-0 rounded-full transition-all duration-500 ${
-              isAware ? 'animate-awareness-glow' : ''
+            className={`absolute inset-0 rounded-full transition-all duration-1000 ${
+              isAware ? 'animate-awareness-ring' : 'opacity-0 scale-0'
             }`}
             style={{
               background: `conic-gradient(from 0deg, 
-                hsl(var(--primary) / 0.3), 
-                hsl(var(--accent) / 0.4), 
-                hsl(var(--primary-glow) / 0.3), 
-                hsl(var(--primary) / 0.3))`,
-              transform: isAware ? `scale(${1.2 + (isHovered ? 0.1 : 0)}) rotate(${Date.now() / 50}deg)` : 'scale(0.8)',
-              opacity: isAware ? (isHovered ? 0.8 : 0.6) : 0,
+                hsl(var(--primary) / 0.4), 
+                hsl(var(--accent) / 0.6), 
+                hsl(var(--primary-glow) / 0.4), 
+                hsl(var(--primary) / 0.4))`,
             }}
           ></div>
           
-          {/* Main avatar container */}
+          {/* Main avatar container with realistic movement */}
           <div 
-            className="relative w-full h-full rounded-full overflow-hidden border-4 border-primary/30 transition-all duration-300"
+            ref={avatarRef}
+            className={`relative w-full h-full rounded-full overflow-hidden border-4 transition-all duration-500 ${
+              !isAware ? 'avatar-sleeping' : 
+              !isLookingAtCursor ? 'avatar-awakening' : 
+              'avatar-aware'
+            }`}
             style={{
-              transform: isAware ? `
+              transform: isLookingAtCursor ? `
                 perspective(1000px)
                 rotateX(${mousePosition.y}deg) 
                 rotateY(${mousePosition.x}deg)
-                scale(${isHovered ? 1.05 : 1})
-                translateZ(${isHovered ? '20px' : '0px'})
-              ` : 'scale(0.9) rotateY(-20deg) rotateX(10deg)',
+                translateZ(10px)
+              ` : undefined,
               transformStyle: 'preserve-3d',
-              filter: isAware ? 
-                `brightness(${1.1 + (isHovered ? 0.1 : 0)}) 
-                 contrast(${1.15 + (isHovered ? 0.1 : 0)}) 
-                 saturate(${1.2 + (isHovered ? 0.1 : 0)})` : 
-                'brightness(0.7) contrast(0.8) saturate(0.6)',
-              boxShadow: isAware ? 
-                `0 20px 40px hsl(var(--primary) / 0.3), 
-                 0 0 60px hsl(var(--primary-glow) / ${isHovered ? 0.4 : 0.2})` : 
-                '0 10px 20px hsl(var(--background) / 0.5)',
+              borderColor: isAware ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--border))',
             }}
           >
-            <img
-              src={emmanuelAvatar}
-              alt="Emmanuel Mbuli"
-              className="w-full h-full object-cover transition-all duration-500"
-              style={{
-                transform: isAware ? `translateZ(10px)` : 'translateZ(0px)',
-              }}
-            />
-            
-            {/* Eye tracking overlay */}
-            {isAware && (
+            {/* Avatar image with overlay effects */}
+            <div className="relative w-full h-full">
+              <img
+                src={emmanuelAvatar}
+                alt="Emmanuel Mbuli"
+                className="w-full h-full object-cover transition-all duration-1000"
+              />
+              
+              {/* Awareness overlay that gradually reveals the avatar */}
               <div 
-                className="absolute inset-0 pointer-events-none"
+                className={`absolute inset-0 transition-all duration-2000 ${
+                  isAware ? 'opacity-0' : 'opacity-70'
+                }`}
                 style={{
-                  background: `radial-gradient(circle at ${50 + eyePosition.x}% ${50 + eyePosition.y}%, 
-                    transparent 30%, 
-                    hsl(var(--primary) / 0.1) 40%, 
-                    transparent 50%)`,
-                  transition: 'background 0.1s ease-out',
+                  background: 'linear-gradient(135deg, hsl(var(--background) / 0.8), hsl(var(--muted) / 0.6))',
                 }}
               ></div>
-            )}
+              
+              {/* Eye tracking highlight */}
+              {isLookingAtCursor && (
+                <div 
+                  className="absolute inset-0 pointer-events-none transition-all duration-200"
+                  style={{
+                    background: `radial-gradient(circle at ${50 + (mousePosition.x * 0.8)}% ${50 + (mousePosition.y * 0.5)}%, 
+                      transparent 20%, 
+                      hsl(var(--primary-glow) / 0.1) 35%, 
+                      transparent 50%)`,
+                  }}
+                ></div>
+              )}
+              
+              {/* Facial feature shadows for depth */}
+              <div 
+                className={`absolute inset-0 pointer-events-none transition-all duration-300 ${
+                  isLookingAtCursor ? 'opacity-30' : 'opacity-0'
+                }`}
+                style={{
+                  background: `linear-gradient(${135 + mousePosition.x}deg, 
+                    transparent 0%, 
+                    hsl(var(--background) / 0.2) 30%, 
+                    transparent 60%)`,
+                }}
+              ></div>
+            </div>
           </div>
           
           {/* Recognition pulse rings */}
           {isAware && (
             <>
-              <div 
-                className="absolute inset-0 rounded-full border-2 border-accent/30 animate-recognition-pulse"
-                style={{ animationDelay: '0s' }}
-              ></div>
-              <div 
-                className="absolute inset-0 rounded-full border-2 border-primary/20 animate-recognition-pulse"
-                style={{ animationDelay: '0.5s' }}
-              ></div>
-              <div 
-                className="absolute inset-0 rounded-full border-2 border-accent/10 animate-recognition-pulse"
-                style={{ animationDelay: '1s' }}
-              ></div>
+              <div className="absolute inset-0 rounded-full border-2 border-accent/40 animate-recognition-pulse-1"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-recognition-pulse-2"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-accent/20 animate-recognition-pulse-3"></div>
             </>
           )}
-          
-          {/* Interactive light reflection */}
-          <div 
-            className="absolute inset-0 rounded-full pointer-events-none transition-all duration-200"
-            style={{
-              background: isAware ? `linear-gradient(
-                ${Math.atan2(mousePosition.y, mousePosition.x) * 180 / Math.PI + 90}deg,
-                transparent 0%,
-                hsl(var(--primary-glow) / 0.1) 30%,
-                hsl(var(--accent) / 0.2) 50%,
-                transparent 70%
-              )` : 'none',
-              opacity: isHovered ? 0.8 : 0.4,
-            }}
-          ></div>
         </div>
 
         {/* Main heading with enhanced animation */}
