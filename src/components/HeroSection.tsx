@@ -1,13 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import emmanuelAvatar from "@/assets/emmanuel-avatar.jpg";
 
 export const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isAware, setIsAware] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
+    // Start awareness animation after a delay
+    const awarenessTimer = setTimeout(() => {
+      setIsAware(true);
+    }, 1000);
+
+    return () => clearTimeout(awarenessTimer);
   }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (avatarRef.current) {
+        const rect = avatarRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const deltaX = (e.clientX - centerX) / rect.width;
+        const deltaY = (e.clientY - centerY) / rect.height;
+        
+        setMousePosition({ x: deltaX * 10, y: deltaY * 10 });
+      }
+    };
+
+    if (isAware) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isAware]);
 
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -19,18 +52,51 @@ export const HeroSection = () => {
       }`}>
         
         {/* Interactive Avatar - Large with awareness animation */}
-        <div className="relative mx-auto w-80 h-80 mb-8 group cursor-pointer">
+        <div 
+          ref={avatarRef}
+          className="relative mx-auto w-80 h-80 mb-8 group cursor-pointer perspective-1000"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchEnd={() => setIsHovered(false)}
+        >
           <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary to-accent p-2 animate-float">
             <img
               src={emmanuelAvatar}
               alt="Emmanuel Mbuli"
-              className="w-full h-full rounded-full object-cover bg-card avatar-awareness transition-all duration-1000"
+              className={`w-full h-full rounded-full object-cover bg-card transition-all duration-300 ${
+                !isAware ? 'avatar-awareness' : ''
+              }`}
+              style={{
+                transform: isAware ? `
+                  rotateY(${mousePosition.x * 0.5}deg) 
+                  rotateX(${-mousePosition.y * 0.3}deg)
+                  scale(${isHovered ? 1.05 : 1})
+                ` : undefined,
+                filter: isAware ? `brightness(${1.1 + (isHovered ? 0.1 : 0)}) contrast(${1.15 + (isHovered ? 0.1 : 0)})` : undefined
+              }}
             />
           </div>
           {/* Awareness glow effect */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 animate-awareness-glow opacity-60"></div>
+          <div 
+            className="absolute inset-0 rounded-full bg-primary/20 animate-awareness-glow opacity-60"
+            style={{
+              opacity: isAware && isHovered ? 0.9 : 0.6,
+              transform: isAware ? `scale(${1.3 + (isHovered ? 0.2 : 0)})` : undefined
+            }}
+          ></div>
           {/* Recognition pulse */}
           <div className="absolute inset-0 rounded-full bg-accent/10 animate-recognition-pulse"></div>
+          
+          {/* Interactive eye tracking effect */}
+          {isAware && (
+            <div 
+              className="absolute inset-0 rounded-full pointer-events-none transition-all duration-200"
+              style={{
+                boxShadow: `${mousePosition.x * 2}px ${mousePosition.y * 2}px 30px hsl(var(--primary-glow) / 0.3)`
+              }}
+            ></div>
+          )}
         </div>
 
         {/* Main heading */}
