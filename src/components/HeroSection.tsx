@@ -18,17 +18,19 @@ export const HeroSection = () => {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}>
         
-        {/* Interactive Avatar */}
-        <div className="relative mx-auto w-48 h-48 mb-8 group cursor-pointer">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary to-accent p-1 animate-float">
+        {/* Interactive Avatar - Large with awareness animation */}
+        <div className="relative mx-auto w-80 h-80 mb-8 group cursor-pointer">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary to-accent p-2 animate-float">
             <img
               src={emmanuelAvatar}
               alt="Emmanuel Mbuli"
-              className="w-full h-full rounded-full object-cover bg-card group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full rounded-full object-cover bg-card avatar-awareness transition-all duration-1000"
             />
           </div>
           {/* Awareness glow effect */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-75 group-hover:opacity-100"></div>
+          <div className="absolute inset-0 rounded-full bg-primary/20 animate-awareness-glow opacity-60"></div>
+          {/* Recognition pulse */}
+          <div className="absolute inset-0 rounded-full bg-accent/10 animate-recognition-pulse"></div>
         </div>
 
         {/* Main heading */}
