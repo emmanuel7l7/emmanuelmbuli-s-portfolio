@@ -35,9 +35,9 @@ export const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
               <img
                 src={emmanuelAvatar}
                 alt="Emmanuel Mbuli"
-                className="w-full h-full rounded-full object-cover border-4 border-primary/30 avatar-pulse"
+                className="w-full h-full rounded-full object-cover border-4 border-primary/30 animate-breathing"
               />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/20 to-accent/20"></div>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/20 to-accent/20 animate-enhanced-float"></div>
             </div>
             <h1 className="text-4xl font-bold text-glow animate-glow-pulse">
               Welcome to Emmanuel's Portfolio
