@@ -63,6 +63,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			boxShadow: {
+				'royal': 'var(--shadow-royal)',
+				'glow': 'var(--shadow-glow)',
+				'accent': 'var(--shadow-accent)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
