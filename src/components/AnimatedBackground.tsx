@@ -77,8 +77,9 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Calculate day/night transition based on scroll
-      const dayProgress = Math.min(scrollProgress * 2, 1);
+      // Ensure scrollProgress is valid and calculate day/night transition
+      const safeScrollProgress = Math.max(0, Math.min(scrollProgress || 0, 1));
+      const dayProgress = Math.min(safeScrollProgress * 2, 1);
       const nightProgress = 1 - dayProgress;
 
       // Background gradient transition
@@ -86,16 +87,32 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
       
       if (dayProgress < 0.5) {
         // Night to dawn
-        const progress = dayProgress * 2;
-        gradient.addColorStop(0, `hsl(225, 25%, ${8 + progress * 10}%)`);
-        gradient.addColorStop(0.6, `hsl(225, 35%, ${12 + progress * 15}%)`);
-        gradient.addColorStop(1, `hsl(225, 25%, ${4 + progress * 20}%)`);
+        const progress = Math.max(0, dayProgress * 2);
+        const lightness1 = Math.max(8, Math.min(98, 8 + progress * 10));
+        const lightness2 = Math.max(12, Math.min(98, 12 + progress * 15));
+        const lightness3 = Math.max(4, Math.min(98, 4 + progress * 20));
+        
+        gradient.addColorStop(0, `hsl(225, 25%, ${lightness1}%)`);
+        gradient.addColorStop(0.6, `hsl(225, 35%, ${lightness2}%)`);
+        gradient.addColorStop(1, `hsl(225, 25%, ${lightness3}%)`);
       } else {
         // Dawn to day
-        const progress = (dayProgress - 0.5) * 2;
-        gradient.addColorStop(0, `hsl(${225 - progress * 25}, ${25 + progress * 30}%, ${18 + progress * 25}%)`);
-        gradient.addColorStop(0.6, `hsl(${225 - progress * 20}, ${35 + progress * 25}%, ${27 + progress * 30}%)`);
-        gradient.addColorStop(1, `hsl(${225 - progress * 15}, ${25 + progress * 20}%, ${24 + progress * 35}%)`);
+        const progress = Math.max(0, Math.min(1, (dayProgress - 0.5) * 2));
+        const hue1 = Math.max(180, Math.min(360, 225 - progress * 25));
+        const saturation1 = Math.max(25, Math.min(100, 25 + progress * 30));
+        const lightness1 = Math.max(18, Math.min(98, 18 + progress * 25));
+        
+        const hue2 = Math.max(180, Math.min(360, 225 - progress * 20));
+        const saturation2 = Math.max(35, Math.min(100, 35 + progress * 25));
+        const lightness2 = Math.max(27, Math.min(98, 27 + progress * 30));
+        
+        const hue3 = Math.max(180, Math.min(360, 225 - progress * 15));
+        const saturation3 = Math.max(25, Math.min(100, 25 + progress * 20));
+        const lightness3 = Math.max(24, Math.min(98, 24 + progress * 35));
+        
+        gradient.addColorStop(0, `hsl(${hue1}, ${saturation1}%, ${lightness1}%)`);
+        gradient.addColorStop(0.6, `hsl(${hue2}, ${saturation2}%, ${lightness2}%)`);
+        gradient.addColorStop(1, `hsl(${hue3}, ${saturation3}%, ${lightness3}%)`);
       }
 
       ctx.fillStyle = gradient;
