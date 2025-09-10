@@ -1,4 +1,3 @@
-import Avatar3D from "./Avatar3D";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -25,10 +24,8 @@ export const HeroSection = ({ scrollProgress = 0 }: HeroSectionProps) => {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}>
         
-        {/* Avatar animation rendered by Three.js */}
-        <div className="relative mx-auto w-96 h-96 mb-8 group flex items-center justify-center">
-          <Avatar3D scrollProgress={scrollProgress} />
-        </div>
+        {/* Hero content without avatar */}
+        <div className="mb-8"></div>
 
         {/* Main heading with enhanced animation */}
   <h1 className="text-5xl md:text-7xl font-bold mb-6 text-glow transition-all duration-1000">

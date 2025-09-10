@@ -77,53 +77,30 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Ensure scrollProgress is valid and calculate day/night transition
+      // Subtle light transition based on scroll
       const safeScrollProgress = Math.max(0, Math.min(scrollProgress || 0, 1));
-      const dayProgress = Math.min(safeScrollProgress * 2, 1);
-      const nightProgress = 1 - dayProgress;
+      const lightProgress = safeScrollProgress * 0.3; // Very subtle transition
 
-      // Background gradient transition
+      // Dim background gradient with subtle lighting
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
       
-      if (dayProgress < 0.5) {
-        // Night to dawn
-        const progress = Math.max(0, dayProgress * 2);
-        const lightness1 = Math.max(8, Math.min(98, 8 + progress * 10));
-        const lightness2 = Math.max(12, Math.min(98, 12 + progress * 15));
-        const lightness3 = Math.max(4, Math.min(98, 4 + progress * 20));
-        
-        gradient.addColorStop(0, `hsl(225, 25%, ${lightness1}%)`);
-        gradient.addColorStop(0.6, `hsl(225, 35%, ${lightness2}%)`);
-        gradient.addColorStop(1, `hsl(225, 25%, ${lightness3}%)`);
-      } else {
-        // Dawn to day
-        const progress = Math.max(0, Math.min(1, (dayProgress - 0.5) * 2));
-        const hue1 = Math.max(180, Math.min(360, 225 - progress * 25));
-        const saturation1 = Math.max(25, Math.min(100, 25 + progress * 30));
-        const lightness1 = Math.max(18, Math.min(98, 18 + progress * 25));
-        
-        const hue2 = Math.max(180, Math.min(360, 225 - progress * 20));
-        const saturation2 = Math.max(35, Math.min(100, 35 + progress * 25));
-        const lightness2 = Math.max(27, Math.min(98, 27 + progress * 30));
-        
-        const hue3 = Math.max(180, Math.min(360, 225 - progress * 15));
-        const saturation3 = Math.max(25, Math.min(100, 25 + progress * 20));
-        const lightness3 = Math.max(24, Math.min(98, 24 + progress * 35));
-        
-        gradient.addColorStop(0, `hsl(${hue1}, ${saturation1}%, ${lightness1}%)`);
-        gradient.addColorStop(0.6, `hsl(${hue2}, ${saturation2}%, ${lightness2}%)`);
-        gradient.addColorStop(1, `hsl(${hue3}, ${saturation3}%, ${lightness3}%)`);
-      }
+      const baseLightness1 = 8 + lightProgress * 4; // Very subtle change from 8% to 12%
+      const baseLightness2 = 12 + lightProgress * 3; // From 12% to 15%
+      const baseLightness3 = 4 + lightProgress * 3; // From 4% to 7%
+      
+      gradient.addColorStop(0, `hsl(225, 25%, ${baseLightness1}%)`);
+      gradient.addColorStop(0.6, `hsl(225, 35%, ${baseLightness2}%)`);
+      gradient.addColorStop(1, `hsl(225, 25%, ${baseLightness3}%)`);
 
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw stars (fade out during day)
+      // Draw stars (subtle dimming with scroll)
       stars.forEach((star) => {
         star.twinklePhase += star.twinkleSpeed;
         
         const twinkle = (Math.sin(star.twinklePhase) + 1) * 0.5;
-        const baseOpacity = nightProgress * 0.8;
+        const baseOpacity = (1 - safeScrollProgress * 0.4) * 0.6; // Gentle fade, keep some stars
         const opacity = baseOpacity * (0.3 + twinkle * 0.7);
 
         if (opacity > 0.05) {
@@ -160,51 +137,7 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
         }
       });
 
-      // Draw sun (appears during day)
-      if (dayProgress > 0.2) {
-        const sunOpacity = Math.min((dayProgress - 0.2) / 0.6, 1);
-        const sunY = canvas.height * 0.2 + (1 - dayProgress) * canvas.height * 0.3;
-        const sunX = canvas.width * 0.8;
-
-        // Sun rays
-        ctx.save();
-        ctx.globalAlpha = sunOpacity * 0.3;
-        ctx.strokeStyle = `hsl(45, 100%, 70%)`;
-        ctx.lineWidth = 2;
-        
-        for (let i = 0; i < 12; i++) {
-          const angle = (i / 12) * Math.PI * 2;
-          const rayLength = 40 + Math.sin(Date.now() * 0.001 + i) * 10;
-          const startX = sunX + Math.cos(angle) * 50;
-          const startY = sunY + Math.sin(angle) * 50;
-          const endX = sunX + Math.cos(angle) * (50 + rayLength);
-          const endY = sunY + Math.sin(angle) * (50 + rayLength);
-          
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(endX, endY);
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // Sun body
-        ctx.save();
-        ctx.globalAlpha = sunOpacity;
-        const sunGradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 40);
-        sunGradient.addColorStop(0, `hsl(45, 100%, 75%)`);
-        sunGradient.addColorStop(0.7, `hsl(40, 100%, 65%)`);
-        sunGradient.addColorStop(1, `hsl(35, 90%, 55%)`);
-        
-        ctx.fillStyle = sunGradient;
-        ctx.beginPath();
-        ctx.arc(sunX, sunY, 40, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.shadowColor = `hsl(45, 100%, 60%)`;
-        ctx.shadowBlur = 30;
-        ctx.fill();
-        ctx.restore();
-      }
+      // No sun - removed as requested
 
       // Draw clouds
       clouds.forEach((cloud, index) => {
@@ -213,9 +146,9 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
           cloud.x = -cloud.size;
         }
 
-        const cloudOpacity = dayProgress * cloud.opacity;
+        const cloudOpacity = cloud.opacity * 0.15; // Barely visible clouds
         
-        if (cloudOpacity > 0.05) {
+        if (cloudOpacity > 0.01) {
           // Mouse interaction - clouds drift away from cursor
           const dx = cloud.x - mouseRef.current.x;
           const dy = cloud.y - mouseRef.current.y;
@@ -229,14 +162,14 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
           ctx.save();
           ctx.globalAlpha = cloudOpacity;
           
-          // Cloud gradient
+          // Subtle cloud gradient (barely visible)
           const cloudGradient = ctx.createRadialGradient(
             cloud.x, cloud.y, 0,
             cloud.x, cloud.y, cloud.size
           );
-          cloudGradient.addColorStop(0, `hsl(200, 20%, 90%)`);
-          cloudGradient.addColorStop(0.6, `hsl(200, 15%, 80%)`);
-          cloudGradient.addColorStop(1, `hsl(200, 10%, 70%)`);
+          cloudGradient.addColorStop(0, `hsl(225, 10%, 20%)`);
+          cloudGradient.addColorStop(0.6, `hsl(225, 8%, 18%)`);
+          cloudGradient.addColorStop(1, `hsl(225, 5%, 15%)`);
           
           ctx.fillStyle = cloudGradient;
           
