@@ -77,30 +77,34 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Subtle light transition based on scroll
+      // Subtle but noticeable light transition based on scroll
       const safeScrollProgress = Math.max(0, Math.min(scrollProgress || 0, 1));
-      const lightProgress = safeScrollProgress * 0.3; // Very subtle transition
-
-      // Dim background gradient with subtle lighting
+      
+      // Dim background gradient with clear but subtle lighting transition
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
       
-      const baseLightness1 = 8 + lightProgress * 4; // Very subtle change from 8% to 12%
-      const baseLightness2 = 12 + lightProgress * 3; // From 12% to 15%
-      const baseLightness3 = 4 + lightProgress * 3; // From 4% to 7%
+      // Transition from dark night to dim daylight
+      const baseLightness1 = 8 + safeScrollProgress * 12; // From 8% to 20%
+      const baseLightness2 = 12 + safeScrollProgress * 15; // From 12% to 27%
+      const baseLightness3 = 4 + safeScrollProgress * 10; // From 4% to 14%
       
-      gradient.addColorStop(0, `hsl(225, 25%, ${baseLightness1}%)`);
-      gradient.addColorStop(0.6, `hsl(225, 35%, ${baseLightness2}%)`);
-      gradient.addColorStop(1, `hsl(225, 25%, ${baseLightness3}%)`);
+      // Slightly reduce saturation as it gets lighter for more natural look
+      const baseSaturation1 = 25 - safeScrollProgress * 5; // From 25% to 20%
+      const baseSaturation2 = 35 - safeScrollProgress * 8; // From 35% to 27%
+      
+      gradient.addColorStop(0, `hsl(225, ${baseSaturation1}%, ${baseLightness1}%)`);
+      gradient.addColorStop(0.6, `hsl(225, ${baseSaturation2}%, ${baseLightness2}%)`);
+      gradient.addColorStop(1, `hsl(225, ${baseSaturation1}%, ${baseLightness3}%)`);
 
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw stars (subtle dimming with scroll)
+      // Draw stars (fade as background gets lighter)
       stars.forEach((star) => {
         star.twinklePhase += star.twinkleSpeed;
         
         const twinkle = (Math.sin(star.twinklePhase) + 1) * 0.5;
-        const baseOpacity = (1 - safeScrollProgress * 0.4) * 0.6; // Gentle fade, keep some stars
+        const baseOpacity = (1 - safeScrollProgress * 0.8) * 0.7; // More noticeable fade
         const opacity = baseOpacity * (0.3 + twinkle * 0.7);
 
         if (opacity > 0.05) {
@@ -146,7 +150,7 @@ export const AnimatedBackground = ({ scrollProgress }: AnimatedBackgroundProps) 
           cloud.x = -cloud.size;
         }
 
-        const cloudOpacity = cloud.opacity * 0.15; // Barely visible clouds
+        const cloudOpacity = cloud.opacity * (0.1 + safeScrollProgress * 0.1); // Slightly more visible as it gets lighter
         
         if (cloudOpacity > 0.01) {
           // Mouse interaction - clouds drift away from cursor
