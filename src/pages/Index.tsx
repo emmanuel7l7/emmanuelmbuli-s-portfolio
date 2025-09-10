@@ -29,7 +29,7 @@ const Index = () => {
       <footer className="py-8 border-t border-primary/20 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-6 text-center">
           <p className="text-muted-foreground">
-            © 2024 Emmanuel Mbuli. Crafted with passion and creativity.
+            © 2025 Emmanuel Mbuli. Crafted with passion and creativity.
           </p>
         </div>
       </footer>

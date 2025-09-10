@@ -14,8 +14,8 @@ export const ContactSection = () => {
     {
       icon: Phone,
       label: "Phone",
-      value: "0746283053",
-      href: "tel:0746283053",
+      value: "+255746283053",
+      href: "tel:+255746283053",
       color: "text-green-400"
     }
   ];
