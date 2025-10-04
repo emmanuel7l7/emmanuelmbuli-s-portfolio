@@ -7,7 +7,7 @@ export const WorkSection = () => {
   const featuredProject = {
     title: "FarmersSoko Solution",
     description: "My final year project - A comprehensive platform connecting farmers directly with buyers, eliminating middlemen and ensuring fair prices for agricultural products.",
-    technologies: ["React", "Node.js", "MongoDB", "Express"],
+    technologies: ["React", "TypeScript", "Node.js", "Shadcn", "Tailwind"],
     status: "Featured Project",
     link: "#", // To be updated with actual link
   };
